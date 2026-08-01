@@ -1,0 +1,46 @@
+# Default values for kenya-forecasts.
+
+image:
+  repository: ghcr.io/rhiza-research/kenya-forecasts
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 8334
+
+# Public hostname. Written to general.host by the entrypoint.
+host: kenya-forecasts.sheerwater.rhizaresearch.org
+
+# Bucket to browse, bare name. The entrypoint prefixes the leading slash that
+# makes the bucket the browse root instead of the bucket list.
+bucket: kenya-forecasting-data
+
+# Name of the Kubernetes secret holding FILESTASH_SECRET_KEY,
+# FILESTASH_ADMIN_BCRYPT, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY.
+# Created by Terraform, not by this chart.
+secretName: kenya-forecasts-secrets
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Bound on /app/data, a per-pod emptyDir. Filestash copies a whole object into
+# /app/data/cache to answer a Range request, so this must exceed the largest
+# object a visitor can fetch. Applied to the volume and to ephemeral-storage so
+# the two boundaries coincide.
+ephemeralStorage:
+  sizeLimit: 4Gi
+  request: 1Gi
+
+ingress:
+  enabled: true
+  className: nginx
+  clusterIssuer: letsencrypt-prod
+  tlsSecretName: kenya-forecasts-tls

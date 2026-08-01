@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kenya-forecasts.fullname" . }}
+  labels:
+    {{- include "kenya-forecasts.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  # /app/data is a per-pod emptyDir rebuilt at every start, so overlapping pods
+  # buy nothing.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "kenya-forecasts.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kenya-forecasts.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      # The image runs as the filestash user, uid/gid 1000. fsGroup makes the
+      # emptyDir writable by it.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: FILESTASH_HOST
+              value: {{ include "kenya-forecasts.host" . | quote }}
+            - name: S3_BUCKET
+              value: {{ required "bucket is required: the entrypoint refuses to start without it" .Values.bucket | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
+          resources:
+            requests:
+              {{- toYaml .Values.resources.requests | nindent 14 }}
+              ephemeral-storage: {{ .Values.ephemeralStorage.request }}
+            limits:
+              {{- toYaml .Values.resources.limits | nindent 14 }}
+              # Same value as the emptyDir sizeLimit: the kubelet counts that
+              # volume against this limit, so the boundaries should coincide.
+              ephemeral-storage: {{ .Values.ephemeralStorage.sizeLimit }}
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 5
+      volumes:
+        # Filestash writes its rendered config, caches and logs here; none of it
+        # outlives the pod. A Range request copies the whole object into
+        # /app/data/cache first, so the limit contains that rather than letting
+        # it fill the node.
+        - name: data
+          emptyDir:
+            sizeLimit: {{ .Values.ephemeralStorage.sizeLimit }}

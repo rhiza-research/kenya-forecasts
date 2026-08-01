@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "kenya-forecasts.fullname" . }}
+  labels:
+    {{- include "kenya-forecasts.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # The admin console is not reachable in production, and Filestash prefix-
+    # matches /admin so /administrator serves the backoffice too. /api/files/zip
+    # streams a recursive archive of whatever path it is given, so ?path=/
+    # returns the entire bucket to an anonymous visitor. The `^~` rules are the
+    # fast path; nginx prefix locations are case-sensitive, so the `~*` rule
+    # catches /Admin and /ADMIN.
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ^~ /admin { return 404; }
+      location ^~ /api/files/zip { return 404; }
+      location ~* ^/(admin|api/files/zip) { return 404; }
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ include "kenya-forecasts.host" . | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  rules:
+    - host: {{ include "kenya-forecasts.host" . | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "kenya-forecasts.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

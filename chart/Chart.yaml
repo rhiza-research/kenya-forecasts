@@ -1,0 +1,8 @@
+apiVersion: v2
+name: kenya-forecasts
+description: Public read-only file browser over the KMSA forecast bucket
+
+type: application
+
+version: 0.1.0
+appVersion: "0.1.0"
