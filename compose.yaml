@@ -1,0 +1,13 @@
+services:
+  kenya-forecasts:
+    build: .
+    image: ghcr.io/rhiza-research/kenya-forecasts:latest
+    ports:
+      - "8334:8334"
+    env_file: .env
+    environment:
+      # Filestash builds redirects from general.host, so this must be the host
+      # you browse from — not localhost when the Docker context is remote.
+      FILESTASH_HOST: ${FILESTASH_HOST:-localhost:8334}
+      # The entrypoint prefixes the leading slash; give it the bare name.
+      S3_BUCKET: ${S3_BUCKET:-kenya-forecasting-data}
