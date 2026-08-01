@@ -1,0 +1,16 @@
+# Last match wins, and a directory excluded by an earlier pattern is not
+# descended into, so every level has to be un-ignored before its contents can
+# match: app, then app/plugin, then app/plugin/branding.
+*
+!app
+app/*
+!app/config.json
+!app/entrypoint.sh
+!app/plugin
+app/plugin/*
+!app/plugin/branding
+app/plugin/branding/*
+!app/plugin/branding/manifest.json
+!app/plugin/branding/branding.css
+!app/plugin/branding/kmsa-logo.jpg
+!app/plugin/branding/kmsa-favicon.png

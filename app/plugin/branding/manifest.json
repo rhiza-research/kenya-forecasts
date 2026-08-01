@@ -1,0 +1,14 @@
+{
+  "author": "Rhiza Research",
+  "version": "1.0.0",
+  "modules": [
+    {
+      "type": "css",
+      "entrypoint": "branding.css"
+    },
+    {
+      "type": "favicon",
+      "entrypoint": "kmsa-favicon.png"
+    }
+  ]
+}
