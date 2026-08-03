@@ -70,6 +70,16 @@ The Ingress returns 404 for `/admin` and `/api/files/zip`, so the admin console
 is reachable only when running locally; production settings are baked into
 `app/config.json` rather than clicked in.
 
+## License
+
+Copyright 2026 Rhiza Research. AGPL-3.0-only; the full text is in `LICENSE`, and
+a copy ships in the image at `/licenses/LICENSE`.
+
+The image contains upstream [Filestash](https://github.com/mickael-kerjean/filestash)
+verbatim, which is AGPL-3.0. The corresponding source for that part is the base
+image this repo builds on,
+`machines/filestash@sha256:f24de790b8828f66807c9097e48add1e846ca0cd2d3a936b3c3e845024e4fe9a`.
+
 ## Outstanding
 
 - The S3 signing region is `us`, unverified against live GCS. If listing fails

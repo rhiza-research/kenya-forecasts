@@ -2,6 +2,7 @@
 # descended into, so every level has to be un-ignored before its contents can
 # match: app, then app/plugin, then app/plugin/branding.
 *
+!LICENSE
 !app
 app/*
 !app/config.json

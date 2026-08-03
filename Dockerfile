@@ -41,8 +41,17 @@ RUN set -eu; \
 
 FROM machines/filestash@sha256:f24de790b8828f66807c9097e48add1e846ca0cd2d3a936b3c3e845024e4fe9a
 
+# Upstream sets no org.opencontainers.image.* labels — only the legacy
+# MAINTAINER — so these add rather than override. AGPL because the image carries
+# Filestash verbatim and everything added here is licensed to match.
+LABEL org.opencontainers.image.licenses="AGPL-3.0-only" \
+      org.opencontainers.image.source="https://github.com/rhiza-research/kenya-forecasts" \
+      org.opencontainers.image.description="Public read-only file browser over the KMSA forecast bucket"
+
 USER root
 COPY --chown=1000:1000 app/config.json /app/config.json.tmpl
+# A copy of the license travels with the artifact, per the OCI convention.
+COPY --chown=1000:1000 LICENSE /licenses/LICENSE
 # Staged outside /app/data because the deployment mounts an emptyDir there,
 # which would mask anything baked into state/plugins. The entrypoint installs it.
 COPY --from=plugin-build --chown=1000:1000 /branding.zip /app/plugin/branding.zip
