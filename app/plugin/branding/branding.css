@@ -65,7 +65,7 @@ body::before {
 }
 
 body::after {
-    content: 'Kenya Meteorological Service Authority forecasts. Browse and download the archive; it is read-only.';
+    content: 'Forecast archive of the Kenya Meteorological Service Authority';
     position: fixed;
     top: 0;
     left: 160px;
@@ -184,8 +184,15 @@ button[data-action=delete] {
 }
 
 /*
- * Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip. The
- * footer grows rather than shrinking: the attribution is about 90 characters
+ * Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip.
+ *
+ * The caption is 62 characters and shares the strip with the logo, so it has
+ * about 209px at 360px wide and 169px at 320px. 12px rather than 13px keeps the
+ * wrap inside three lines at 1.35, which is 49px and fits the 52px strip at the
+ * narrowest common width. The offsets are unchanged: they clear the logo, whose
+ * size did not change.
+ *
+ * The footer grows rather than shrinking: the attribution is about 90 characters
  * and wraps to two lines below roughly 500px, and it is a licence notice, so it
  * wraps in a taller strip rather than being clipped or ellipsised. Two 11px
  * lines at 1.25 need 28px, and 44px leaves room around them.
@@ -204,7 +211,7 @@ button[data-action=delete] {
     body::after {
         left: 139px;
         right: 12px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     #app::after {
