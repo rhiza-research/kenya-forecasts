@@ -167,6 +167,23 @@ button[data-action=delete] {
 }
 
 /*
+ * There is nothing to log out of: every visitor is the same anonymous
+ * passthrough session, so the button only buys a re-auth round trip.
+ *
+ * breadcrumb.js renders it as div.li.component_logout wrapping the anchor to
+ * /logout, and breadcrumb.css declares
+ * `.component_breadcrumb .breadcrumb .ul div, .component_breadcrumb .breadcrumb
+ * .ul .li { display: inline-block }`, both of which match that div at four
+ * classes or better. A bare class rule here is one class and loses, and it also
+ * loses on document order, so the important flag is what settles it. Hiding the
+ * wrapper takes the anchor with it, so /logout is not reachable by keyboard
+ * either.
+ */
+.component_logout {
+    display: none !important;
+}
+
+/*
  * Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip. The
  * footer grows rather than shrinking: the attribution is about 90 characters
  * and wraps to two lines below roughly 500px, and it is a licence notice, so it
