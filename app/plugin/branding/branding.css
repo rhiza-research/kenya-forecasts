@@ -27,8 +27,24 @@
  */
 :root {
     --kmsa-banner-height: 60px;
+    --kmsa-footer-height: 30px;
     --kmsa-banner-background: #ffffff;
     --kmsa-banner-foreground: #333333;
+    --kmsa-chrome-background: #ffffff;
+}
+
+/*
+ * The menu chrome surface. The sidebar and the breadcrumb set no background of
+ * their own, so what shows through them is .component_filemanager_shell, and
+ * decorator_shell_filemanager.css gives that `background: white` with a
+ * `body.dark-mode` override of #2b2d30. Those are literals; upstream exposes no
+ * custom property for this surface, so the pair is restated here and switched
+ * off the same class. Not var(--dark): it happens to equal #2b2d30 in dark mode,
+ * but it is #24272a in light mode, where the chrome is white, so it would look
+ * correct in one theme and invert in the other.
+ */
+body.dark-mode {
+    --kmsa-chrome-background: #2b2d30;
 }
 
 body::before {
@@ -66,16 +82,58 @@ body::after {
 }
 
 /*
- * Shrink the app by the banner height. #app is a static height:100% flow
- * element, so padding plus border-box takes the space out of its content box
- * rather than clipping: the page inside is a flex column whose .scroll-y child
- * is flex:1, so the file list keeps its own scrollbar. It also moves the origin
- * of the toolbar, which is position:sticky top:0 inside .scroll-y, to below the
- * banner instead of underneath it.
+ * Shrink the app by the banner and the footer. #app is a static height:100%
+ * flow element, so padding plus border-box takes the space out of its content
+ * box on both sides rather than clipping. Inside it .component_page_filespage
+ * is a flex column with min-height:100%, which resolves against that reduced
+ * content box, and its only growable child is .scroll-y at flex:1 with its own
+ * overflow-y, so the column cannot exceed the box: the scroller starts below
+ * the banner and ends at the top of the footer. That is also what puts the
+ * toolbar, position:sticky top:0 inside .scroll-y, below the banner rather than
+ * underneath it.
  */
 #app {
     padding-top: var(--kmsa-banner-height);
+    padding-bottom: var(--kmsa-footer-height);
     box-sizing: border-box;
+}
+
+/*
+ * Licence and source attribution. Plain text, not a link: the alternative is a
+ * plugin patch module, whose diff is applied against upstream's compiled
+ * frontend and whose every failure path logs at debug and returns the unpatched
+ * original, so a base-digest bump could drop the attribution silently.
+ * body::before and body::after are the banner, so this rides on #app.
+ *
+ * Unlike the banner it carries no image, so it sits with the menu chrome rather
+ * than as a light slab: --kmsa-chrome-background is the shell surface the
+ * sidebar and breadcrumb show, --light is the muted label colour the sidebar
+ * headings and toolbar buttons use, and --border is one step lighter than that
+ * surface rather than a black rule. --light and --border are upstream's own
+ * properties, declared on :root and overridden on body.dark-mode, and #app
+ * inherits both, so the text and the hairline follow the palette.
+ */
+#app::after {
+    content: 'Powered by Filestash, licensed AGPL-3.0. Source: github.com/rhiza-research/kenya-forecasts';
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--kmsa-footer-height);
+    z-index: 1000;
+    box-sizing: border-box;
+    padding: 0 20px;
+    background-color: var(--kmsa-chrome-background);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--light);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.25;
+    pointer-events: none;
 }
 
 /*
@@ -108,10 +166,17 @@ button[data-action=delete] {
     display: none !important;
 }
 
-/* Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip. */
+/*
+ * Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip. The
+ * footer grows rather than shrinking: the attribution is about 90 characters
+ * and wraps to two lines below roughly 500px, and it is a licence notice, so it
+ * wraps in a taller strip rather than being clipped or ellipsised. Two 11px
+ * lines at 1.25 need 28px, and 44px leaves room around them.
+ */
 @media (max-width: 700px) {
     :root {
         --kmsa-banner-height: 52px;
+        --kmsa-footer-height: 44px;
     }
 
     body::before {
@@ -123,5 +188,10 @@ button[data-action=delete] {
         left: 139px;
         right: 12px;
         font-size: 13px;
+    }
+
+    #app::after {
+        padding: 0 12px;
+        font-size: 11px;
     }
 }
