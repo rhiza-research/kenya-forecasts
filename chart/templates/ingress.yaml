@@ -10,15 +10,12 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     # The admin console is not reachable in production, and Filestash prefix-
-    # matches /admin so /administrator serves the backoffice too. /api/files/zip
-    # streams a recursive archive of whatever path it is given, so ?path=/
-    # returns the entire bucket to an anonymous visitor. The `^~` rules are the
-    # fast path; nginx prefix locations are case-sensitive, so the `~*` rule
-    # catches /Admin and /ADMIN.
+    # matches /admin so /administrator serves the backoffice too. The `^~` rule
+    # is the fast path and stops nginx evaluating regexes; nginx prefix locations
+    # are case-sensitive, so the `~*` rule catches /Admin and /ADMIN.
     nginx.ingress.kubernetes.io/server-snippet: |
       location ^~ /admin { return 404; }
-      location ^~ /api/files/zip { return 404; }
-      location ~* ^/(admin|api/files/zip) { return 404; }
+      location ~* ^/admin { return 404; }
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
