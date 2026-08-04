@@ -66,7 +66,7 @@ Push to `main`. `.github/workflows/build.yml` builds and pushes
 IAM, HMAC key, generated secrets, DNS record and the ArgoCD Application itself
 are Terraform, in `infrastructure/terraform/20-gke-cluster/kenya-forecasts.tf`.
 
-The Ingress returns 404 for `/admin` and `/api/files/zip`, so the admin console
+The Ingress returns 404 for `/admin`, so the admin console
 is reachable only when running locally; production settings are baked into
 `app/config.json` rather than clicked in.
 
@@ -79,12 +79,3 @@ The image contains upstream [Filestash](https://github.com/mickael-kerjean/files
 verbatim, which is AGPL-3.0. The corresponding source for that part is the base
 image this repo builds on,
 `machines/filestash@sha256:f24de790b8828f66807c9097e48add1e846ca0cd2d3a936b3c3e845024e4fe9a`.
-
-## Outstanding
-
-- The S3 signing region is `us`, unverified against live GCS. If listing fails
-  with a signature or region error, try `auto` and then `us-east-1`.
-- `app/plugin/branding/kmsa-logo.jpg` is a low-resolution placeholder.
-- The emptyDir `sizeLimit` is a containment bound, not a measurement: Filestash
-  copies a whole object into `/app/data/cache` to answer a Range request, and
-  the bucket's largest object is not yet known.

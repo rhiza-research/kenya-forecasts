@@ -12,6 +12,9 @@
   "features": {
     "share": {
       "enable": false
+    },
+    "protection": {
+      "zip_timeout": 60
     }
   },
   "auth": {
