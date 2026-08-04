@@ -7,7 +7,7 @@
     "upload_button": false,
     "display_hidden": false,
     "filepage_default_view": "list",
-    "filepage_default_sort": "name"
+    "filepage_default_sort": "date"
   },
   "features": {
     "share": {
