@@ -13,5 +13,7 @@ app/plugin/*
 app/plugin/branding/*
 !app/plugin/branding/manifest.json
 !app/plugin/branding/branding.css
+!app/plugin/branding/index.js
+!app/plugin/branding/branding.patch
 !app/plugin/branding/kmsa-logo.jpg
 !app/plugin/branding/kmsa-favicon.png

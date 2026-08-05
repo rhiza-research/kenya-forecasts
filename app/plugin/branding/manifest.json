@@ -9,6 +9,10 @@
     {
       "type": "favicon",
       "entrypoint": "kmsa-favicon.png"
+    },
+    {
+      "type": "patch",
+      "entrypoint": "branding.patch"
     }
   ]
 }

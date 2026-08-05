@@ -24,26 +24,35 @@ at the root and builds from the repo root. `app/` holds the runtime config;
   because `/app/data` is an emptyDir that masks whatever the image put there.
 
 Branding ships as a Filestash plugin, a self-contained artifact Filestash loads
-on its own. The build packs `app/plugin/branding/` into a flat `branding.zip` —
-the directory name, the zip name and the plugin name Filestash registers are all
-`branding`, since Filestash takes the plugin name from the zip's basename.
-Filestash discovers zips in `state/plugins/` at startup and registers the `css`
-and `favicon` modules the manifest names.
+on its own. The build packs `app/plugin/branding/` verbatim into a flat
+`branding.zip` — the directory name, the zip name and the plugin name Filestash
+registers are all `branding`, since Filestash takes the plugin name from the
+zip's basename. Filestash discovers zips in `state/plugins/` at startup and
+registers the modules the manifest names.
 
-- `manifest.json` — `author`, `version` and the two modules.
-- `branding.css` — the KMSA banner and the rules hiding the write controls,
-  which fail at GCS anyway. Its logo placeholder is replaced at build time with
-  base64 from `kmsa-logo.jpg`. The logo has to be inlined because Filestash
-  reads only module entrypoints out of the zip and never serves the other
-  entries, so a relative `url()` would 404. The build fails unless the
-  placeholder appears exactly once: `sed` replaces every occurrence, so a second
-  mention in a comment inlines the whole image twice.
+- `manifest.json` — `author`, `version` and three modules, `css`, `favicon` and
+  `patch`.
+- `index.js` — builds the header, the pilot band, the links band and the footer,
+  and marks the listing row named for the current date. Filestash serves it from
+  inside the zip at `/assets/<BUILD_REF>/plugin/branding.zip/index.js`, so
+  `import.meta.url` resolves sibling assets and the logo is a plain `img`.
+- `branding.patch` — a one line insertion into
+  `public/assets/boot/ctrl_boot_frontoffice.js` that imports `index.js`. The
+  frontoffice HTML is out of reach because `ServeIndex` never calls `applyPatch`,
+  and this boot module is in the preload list so it runs on every page load. Both
+  serve paths patch it, `ServeFile` per request and `ServeBundle` once at startup.
+- `branding.css` — layout, color and the rules hiding the write controls, which
+  fail at GCS anyway. No text: the copy lives in `index.js`.
 - `kmsa-logo.jpg` — 330x128, cropped to the mark. Placeholder for the real KMSA
-  asset; replacing it is enough, the build re-inlines it. Not packed into the
-  zip; only its base64 is, inside the stylesheet.
+  asset; replacing the file is enough.
 - `kmsa-favicon.png` — 128x128, the crest on white. PNG because the favicon hook
   sniffs only ICO, PNG and GIF magic bytes and labels anything else
   `image/svg+xml`, which no browser will render for a JPEG.
+
+`applyPatch` returns nil on every failure path and its caller then serves the
+unpatched original, so a patch that stops applying after a base image bump would
+drop the branding without an error, so a bump wants the boot module checked for
+the injected import.
 
 Anonymous read-only access comes from a GCS HMAC key held by a service account
 with `roles/storage.objectViewer` on the bucket and nothing else.
