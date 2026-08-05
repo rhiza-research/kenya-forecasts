@@ -28,6 +28,10 @@ const DESCRIPTION_AFTER_LINK = ").";
 
 const DISCLAIMER = "The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.";
 
+const OFFICIAL_BEFORE_LINK = "For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the ";
+const OFFICIAL_LINK = { text: "Kenya Meteorological Service website", href: "https://meteo.go.ke" };
+const OFFICIAL_AFTER_LINK = ".";
+
 const DATA_LINE = "Forecast data is public sector information from the Government of Kenya, freely available for reuse.";
 
 const LINKS = [
@@ -88,6 +92,13 @@ function buildHeader() {
     description.appendChild(_anchor(DESCRIPTION_LINK.text, DESCRIPTION_LINK.href));
     description.appendChild(document.createTextNode(DESCRIPTION_AFTER_LINK));
     prose.appendChild(description);
+
+    const official = _el("p", "kmsa-blurb kmsa-official");
+    official.appendChild(document.createTextNode(OFFICIAL_BEFORE_LINK));
+    official.appendChild(_anchor(OFFICIAL_LINK.text, OFFICIAL_LINK.href));
+    official.appendChild(document.createTextNode(OFFICIAL_AFTER_LINK));
+    prose.appendChild(official);
+
     prose.appendChild(_el("p", "kmsa-blurb", DISCLAIMER));
     pilot.appendChild(prose);
     top.appendChild(pilot);
