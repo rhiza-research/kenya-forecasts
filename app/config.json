@@ -1,6 +1,6 @@
 {
   "general": {
-    "name": "Kenya Forecasts",
+    "name": "2026 OND Rainy Season Pilot Forecasts",
     "host": "__HOST__",
     "secret_key": "__SECRET_KEY__",
     "force_ssl": false,
