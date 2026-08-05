@@ -152,6 +152,11 @@ body {
     line-height: 1.45;
 }
 
+/* The copy asks for this one to be prominent. */
+.kmsa-official {
+    font-weight: 600;
+}
+
 .kmsa-band-links {
     display: flex;
     flex-wrap: wrap;
