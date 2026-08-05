@@ -41,6 +41,8 @@ const LINKS = [
 
 const SOURCE = { text: "github.com/rhiza-research/kenya-forecasts", href: "https://github.com/rhiza-research/kenya-forecasts" };
 
+const SIDEBAR_LABEL = "Forecast Init Dates";
+
 
 // --- DOM helpers ----------------------------------------------------------
 //
@@ -166,10 +168,29 @@ function markToday(root) {
     }
 }
 
-// Reruns the marking. The listing is absent at startup and is replaced
-// wholesale on navigation, so marking once would not survive either event.
+// Relabels the navigation pane heading in the sidebar.
+//
+// The heading is a text input whose placeholder carries the label, so the label
+// is the placeholder and not any text node. It is found through the pane it
+// labels, div[data-bind="your-files"], rather than by matching the current text,
+// which is a translated string.
+function relabelSidebar(root) {
+    const pane = root.querySelector('[data-bind="your-files"]');
+    if (pane === null || pane.previousElementSibling === null) return;
+    const input = pane.previousElementSibling.querySelector('input[type="text"]');
+    if (input !== null && input.placeholder !== SIDEBAR_LABEL) {
+        input.placeholder = SIDEBAR_LABEL;
+    }
+}
+
+// Reruns both passes. The listing and the sidebar are absent at startup and are
+// replaced wholesale on navigation, so acting once would not survive either
+// event.
 function watchListing() {
-    const run = () => markToday(document.body);
+    const run = () => {
+        markToday(document.body);
+        relabelSidebar(document.body);
+    };
     run();
     const observer = new window.MutationObserver(run);
     observer.observe(document.body, { childList: true, subtree: true });
