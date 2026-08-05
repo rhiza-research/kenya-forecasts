@@ -136,6 +136,13 @@ body {
     line-height: 1.6;
 }
 
+/* The paragraphs stack beside the pill, which stays on the first line. */
+.kmsa-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .kmsa-blurb {
     margin: 0;
     font-size: 12px;

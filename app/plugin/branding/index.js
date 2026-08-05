@@ -22,7 +22,11 @@
 
 const TITLE = "2026 OND Rainy Season Pilot Forecasts";
 
-const BLURB = "This pilot delivers enhanced, agriculture-focused forecasts for the 2026 OND rainy season, produced from the ECMWF operational S2S forecast with custom post-processing. The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.";
+const DESCRIPTION_BEFORE_LINK = "This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing (";
+const DESCRIPTION_LINK = { text: "github.com/alecjong-lab/ECMWF-S2S4AFRICA", href: "https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" };
+const DESCRIPTION_AFTER_LINK = ").";
+
+const DISCLAIMER = "The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.";
 
 const DATA_LINE = "Forecast data is public sector information from the Government of Kenya, freely available for reuse.";
 
@@ -78,7 +82,14 @@ function buildHeader() {
 
     const pilot = _el("div", "kmsa-band kmsa-band-pilot");
     pilot.appendChild(_el("span", "kmsa-pill", "PILOT"));
-    pilot.appendChild(_el("p", "kmsa-blurb", BLURB));
+    const prose = _el("div", "kmsa-prose");
+    const description = _el("p", "kmsa-blurb");
+    description.appendChild(document.createTextNode(DESCRIPTION_BEFORE_LINK));
+    description.appendChild(_anchor(DESCRIPTION_LINK.text, DESCRIPTION_LINK.href));
+    description.appendChild(document.createTextNode(DESCRIPTION_AFTER_LINK));
+    prose.appendChild(description);
+    prose.appendChild(_el("p", "kmsa-blurb", DISCLAIMER));
+    pilot.appendChild(prose);
     top.appendChild(pilot);
 
     const links = _el("div", "kmsa-band kmsa-band-links");
