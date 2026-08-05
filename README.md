@@ -15,8 +15,9 @@ at the root and builds from the repo root. `app/` holds the runtime config;
 `app/plugin/` is the plugins directory, with one plugin per subdirectory.
 
 - `app/config.json` — the Filestash config with `__TOKEN__` placeholders for the
-  four secrets, the public host and `S3_BUCKET` (a bare bucket name; the
-  entrypoint adds the leading slash that roots the browse tree at the bucket).
+  four secrets, the public host, `S3_ENDPOINT` (defaulted by the entrypoint to
+  the GCS XML API) and `S3_BUCKET` (a bare bucket name; the entrypoint adds the
+  leading slash that roots the browse tree at the bucket).
 - `app/entrypoint.sh` — validates the five environment values, substitutes them
   into `/app/data/state/config/config.json`, installs the plugin zip into
   `/app/data/state/plugins/`, and execs Filestash. Both writes happen at runtime
