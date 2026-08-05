@@ -1,0 +1,11 @@
+diff --git a/public/assets/boot/ctrl_boot_frontoffice.js b/public/assets/boot/ctrl_boot_frontoffice.js
+--- a/public/assets/boot/ctrl_boot_frontoffice.js
++++ b/public/assets/boot/ctrl_boot_frontoffice.js
+@@ -6,6 +6,7 @@
+ import { init as setup_cache } from "../pages/filespage/cache.js";
+ import { report } from "../helpers/log.js";
+ import { $error } from "./common.js";
++import "../plugin/branding.zip/index.js";
+ 
+ export default async function main() {
+     try {

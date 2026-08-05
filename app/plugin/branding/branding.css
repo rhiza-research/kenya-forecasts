@@ -1,139 +1,201 @@
 /*
- * KMSA branding, shipped as the css module of the kenya-forecasts plugin.
- * extension.Discovery reads this file out of the plugin zip and hands it to
- * Hooks.Register.CSS, and ctrl.CustomCssHandler writes it to custom.css, which
- * every page loads.
+ * KMSA branding, the css module of the branding plugin. extension.Discovery
+ * reads this file out of the plugin zip and hands it to Hooks.Register.CSS, and
+ * ctrl.CustomCssHandler writes it to custom.css, which every page loads.
  *
- * The placeholder in the background-image url() below is replaced at image build
- * time with a base64 data URI built from kmsa-logo.jpg. It must appear exactly
- * once in this file and nowhere else, comments included: sed substitutes every
- * occurrence, so a second mention inlines the whole image again. The build
- * counts them and fails rather than shipping a doubled stylesheet.
- *
- * The logo has to be inlined at all because Discovery only ever reads a module
- * entrypoint, so no other file in the zip is reachable over HTTP and a relative
- * url() would 404.
+ * This file is layout and colour only. The text and the links are real DOM built
+ * by index.js, because CSS content: text cannot be selected or clicked and the
+ * copy carries URLs people need.
  */
 
 /*
- * Banner geometry. kmsa-logo.jpg is cropped to the content bounding box of the
- * mark, 330x128, aspect 2.58. Keep it that way: the earlier asset was the same
- * mark inside 596x335 of white padding, so background-size scaled the padding
- * and the mark itself rendered at about 21px however large the value was.
- * The mark fills the strip: 48px tall in 60px, 6px clear top and bottom, 124px
- * wide, so 20px of left margin plus that plus a 16px gap puts the text at
- * 160px. The strip stays white because the logo is a JPEG on a white
- * background, so any other shade would frame it as a block.
+ * Every colour lives in these two blocks, so switching the bands between the
+ * mockup's light treatment and the app's dark chrome is an edit here rather than
+ * a rewrite. Provenance matters and is not uniform:
+ *
+ * - The header band is white in both themes because kmsa-logo.jpg is a JPEG on a
+ *   white background, so any other surface frames it as a rectangle. Replacing
+ *   the asset with a transparent one is what would free this.
+ * - The band, pill and link colours are sampled from Genevieve's mockup. They
+ *   are literals and are NOT in upstream's palette, which has no blue-grey.
+ * - The dark values are upstream's own: #2b2d30 is the shell surface from
+ *   components/decorator_shell_filemanager.css, and --border, --color, --light
+ *   and --primary are properties from css/designsystem.css overridden in
+ *   css/designsystem_darkmode.css, which #app and body both inherit.
  */
 :root {
-    --kmsa-banner-height: 60px;
-    --kmsa-footer-height: 30px;
-    --kmsa-banner-background: #ffffff;
-    --kmsa-banner-foreground: #333333;
-    --kmsa-chrome-background: #ffffff;
+    --kmsa-header-background: #ffffff;
+    --kmsa-header-foreground: #333333;
+    --kmsa-band-background: #eef2f7;
+    --kmsa-band-foreground: #3c4653;
+    --kmsa-band-border: rgba(0, 0, 0, 0.10);
+    --kmsa-pill-background: #1f4e79;
+    --kmsa-pill-foreground: #ffffff;
+    --kmsa-link-color: #1a5fa8;
 }
 
-/*
- * The menu chrome surface. The sidebar and the breadcrumb set no background of
- * their own, so what shows through them is .component_filemanager_shell, and
- * decorator_shell_filemanager.css gives that `background: white` with a
- * `body.dark-mode` override of #2b2d30. Those are literals; upstream exposes no
- * custom property for this surface, so the pair is restated here and switched
- * off the same class. Not var(--dark): it happens to equal #2b2d30 in dark mode,
- * but it is #24272a in light mode, where the chrome is white, so it would look
- * correct in one theme and invert in the other.
- */
 body.dark-mode {
-    --kmsa-chrome-background: #2b2d30;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--kmsa-banner-height);
-    z-index: 1000;
-    background-color: var(--kmsa-banner-background);
-    background-image: url('__KMSA_LOGO_DATA_URI__');
-    background-repeat: no-repeat;
-    background-position: 20px center;
-    background-size: auto 48px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-    pointer-events: none;
-}
-
-body::after {
-    content: 'Forecast archive of the Kenya Meteorological Service Authority';
-    position: fixed;
-    top: 0;
-    left: 160px;
-    right: 20px;
-    height: var(--kmsa-banner-height);
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    color: var(--kmsa-banner-foreground);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-size: 15px;
-    line-height: 1.35;
-    pointer-events: none;
+    --kmsa-band-background: #2b2d30;
+    --kmsa-band-foreground: var(--light);
+    --kmsa-band-border: var(--border);
+    --kmsa-link-color: var(--primary);
 }
 
 /*
- * Shrink the app by the banner and the footer. #app is a static height:100%
- * flow element, so padding plus border-box takes the space out of its content
- * box on both sides rather than clipping. Inside it .component_page_filespage
- * is a flex column with min-height:100%, which resolves against that reduced
- * content box, and its only growable child is .scroll-y at flex:1 with its own
- * overflow-y, so the column cannot exceed the box: the scroller starts below
- * the banner and ends at the top of the footer. That is also what puts the
- * toolbar, position:sticky top:0 inside .scroll-y, below the banner rather than
- * underneath it.
- */
-#app {
-    padding-top: var(--kmsa-banner-height);
-    padding-bottom: var(--kmsa-footer-height);
-    box-sizing: border-box;
-}
-
-/*
- * Licence and source attribution. Plain text, not a link: the alternative is a
- * plugin patch module, whose diff is applied against upstream's compiled
- * frontend and whose every failure path logs at debug and returns the unpatched
- * original, so a base-digest bump could drop the attribution silently.
- * body::before and body::after are the banner, so this rides on #app.
+ * Lay the page out as a column: header, app, footer. The browser gives the app
+ * whatever is left over, so nothing has to measure the two chrome regions or
+ * reserve space for them.
  *
- * Unlike the banner it carries no image, so it sits with the menu chrome rather
- * than as a light slab: --kmsa-chrome-background is the shell surface the
- * sidebar and breadcrumb show, --light is the muted label colour the sidebar
- * headings and toolbar buttons use, and --border is one step lighter than that
- * surface rather than a black rule. --light and --border are upstream's own
- * properties, declared on :root and overridden on body.dark-mode, and #app
- * inherits both, so the text and the hairline follow the palette.
+ * #app needs all three declarations. Upstream sets height:100%, which would make
+ * it a full viewport tall on top of its siblings, so height:auto hands sizing to
+ * the flex algorithm. min-height:0 overrides the min-height:auto that flex items
+ * default to, without which the app refuses to shrink below its content and
+ * pushes the footer off screen. flex:1 then claims the remaining space.
+ *
+ * Inside #app, .component_page_filespage is a flex column with min-height:100%
+ * whose only growable child is .scroll-y at flex:1 with its own overflow-y. That
+ * resolves against #app's flex-resolved height, so the scroller spans exactly
+ * the gap between the bands and the toolbar, position:sticky top:0 inside
+ * .scroll-y, sticks to the underside of the header.
  */
-#app::after {
-    content: 'Powered by Filestash, licensed AGPL-3.0. Source: github.com/rhiza-research/kenya-forecasts';
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: var(--kmsa-footer-height);
-    z-index: 1000;
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+
+#app {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+}
+
+.kmsa-chrome {
+    flex: none;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.kmsa-chrome-bottom {
+    padding: 7px 20px;
+    background-color: var(--kmsa-band-background);
+    border-top: 1px solid var(--kmsa-band-border);
+    color: var(--kmsa-band-foreground);
+    text-align: center;
+}
+
+.kmsa-band {
     box-sizing: border-box;
     padding: 0 20px;
-    background-color: var(--kmsa-chrome-background);
-    border-top: 1px solid var(--border);
+}
+
+/* Header. The logo is 330x128, cropped to the mark, so 48px tall is 124px wide
+   and it stays sharp. Keep the asset cropped: padded artwork makes the height
+   scale the padding instead of the mark. */
+.kmsa-band-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--light);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    gap: 16px;
+    height: 60px;
+    background-color: var(--kmsa-header-background);
+    border-bottom: 1px solid var(--kmsa-band-border);
+}
+
+.kmsa-logo {
+    height: 48px;
+    width: auto;
+    display: block;
+    flex: none;
+}
+
+.kmsa-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--kmsa-header-foreground);
+}
+
+.kmsa-band-pilot {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: var(--kmsa-band-background);
+    color: var(--kmsa-band-foreground);
+}
+
+.kmsa-pill {
+    flex: none;
+    margin-top: 1px;
+    padding: 2px 9px;
+    border-radius: 10px;
+    background-color: var(--kmsa-pill-background);
+    color: var(--kmsa-pill-foreground);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+}
+
+.kmsa-blurb {
+    margin: 0;
     font-size: 12px;
-    line-height: 1.25;
-    pointer-events: none;
+    line-height: 1.45;
+}
+
+.kmsa-band-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px 22px;
+    padding-bottom: 8px;
+    background-color: var(--kmsa-band-background);
+    border-bottom: 1px solid var(--kmsa-band-border);
+    font-size: 12px;
+}
+
+.kmsa-link-group {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.kmsa-link-label {
+    color: var(--kmsa-band-foreground);
+    font-weight: 600;
+}
+
+.kmsa-link {
+    color: var(--kmsa-link-color);
+    text-decoration: underline;
+}
+
+.kmsa-footer-line {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+/* TODAY badge on the row for the current date, added by index.js. */
+.kmsa-today-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background-color: var(--kmsa-pill-background);
+    color: var(--kmsa-pill-foreground);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    vertical-align: middle;
+}
+
+.component_thing[data-kmsa-today=true] {
+    background-color: var(--kmsa-band-background);
+    border-radius: 3px;
 }
 
 /*
@@ -184,38 +246,36 @@ button[data-action=delete] {
 }
 
 /*
- * Same ratio at a smaller size: a 40px mark is 103px wide in a 52px strip.
- *
- * The caption is 62 characters and shares the strip with the logo, so it has
- * about 209px at 360px wide and 169px at 320px. 12px rather than 13px keeps the
- * wrap inside three lines at 1.35, which is 49px and fits the 52px strip at the
- * narrowest common width. The offsets are unchanged: they clear the logo, whose
- * size did not change.
- *
- * The footer grows rather than shrinking: the attribution is about 90 characters
- * and wraps to two lines below roughly 500px, and it is a licence notice, so it
- * wraps in a taller strip rather than being clipped or ellipsised. Two 11px
- * lines at 1.25 need 28px, and 44px leaves room around them.
+ * Narrow viewports. The header stacks the logo above the title, and the pilot
+ * band drops the pill onto its own line, so both regions get taller rather than
+ * clipping their text. index.js measures the result, so nothing here has to
+ * restate a height.
  */
 @media (max-width: 700px) {
-    :root {
-        --kmsa-banner-height: 52px;
-        --kmsa-footer-height: 44px;
-    }
-
-    body::before {
-        background-size: auto 40px;
-        background-position: 12px center;
-    }
-
-    body::after {
-        left: 139px;
-        right: 12px;
-        font-size: 12px;
-    }
-
-    #app::after {
+    .kmsa-band {
         padding: 0 12px;
-        font-size: 11px;
+    }
+
+    .kmsa-band-header {
+        height: auto;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        gap: 8px;
+    }
+
+    .kmsa-logo {
+        height: 40px;
+    }
+
+    .kmsa-title {
+        font-size: 15px;
+    }
+
+    .kmsa-band-pilot {
+        flex-wrap: wrap;
+    }
+
+    .kmsa-chrome-bottom {
+        padding: 6px 12px;
     }
 }
