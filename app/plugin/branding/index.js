@@ -44,7 +44,7 @@ const LINKS = [
 
 const SOURCE = { text: "github.com/rhiza-research/kenya-forecasts", href: "https://github.com/rhiza-research/kenya-forecasts" };
 
-const SIDEBAR_LABEL = "Forecast Initialization Dates";
+const SIDEBAR_LABEL = "Forecast Init Dates";
 
 
 // --- DOM helpers ----------------------------------------------------------
