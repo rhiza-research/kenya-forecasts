@@ -35,7 +35,7 @@ const OFFICIAL_BEFORE_LINK = "For the official forecasts, weather advisories, se
 const OFFICIAL_LINK = { text: "Kenya Meteorological Service website", href: "https://meteo.go.ke" };
 const OFFICIAL_AFTER_LINK = ".";
 
-const DATA_LINE = "Forecast data is public sector information from the Government of Kenya, freely available for reuse.";
+const DATA_LINE = "Pilot data access is provided by the Kenya Meteorological Service Authority (KMSA) under the Creative Commons Attribution 4.0 International (CC BY 4.0) license. Users must provide appropriate attribution when using these data.";
 
 const LINKS = [
     { label: "Methodology:", text: "github.com/alecjong-lab/ECMWF-S2S4AFRICA", href: "https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" },
