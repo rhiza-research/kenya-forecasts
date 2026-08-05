@@ -51,21 +51,32 @@ registers the modules the manifest names.
 
 `applyPatch` returns nil on every failure path and its caller then serves the
 unpatched original, so a patch that stops applying after a base image bump would
-drop the branding without an error, so a bump wants the boot module checked for
-the injected import.
+drop the branding without an error. The `validate` job in the build workflow is
+the detector: it starts the image, fails if the injected import is absent from
+the boot module, and only then does the build publish.
 
 Anonymous read-only access comes from a GCS HMAC key held by a service account
 with `roles/storage.objectViewer` on the bucket and nothing else.
 
 ## Run locally
 
+Against the real bucket, which needs an HMAC key:
+
 ```sh
 cp .env.example .env      # fill in the HMAC key, secret key and bcrypt hash
-docker compose up         # runs the published image
-docker compose up --build # rebuilds it from the Dockerfile
+docker compose up --build
 ```
 
 Then open <http://localhost:8334>.
+
+Without any credential, against a minio stand-in for the bucket:
+
+```sh
+docker compose -f compose.local.yaml up -d --build
+```
+
+That stack publishes no port. `general.host` has to match the request `Host`,
+and the service name is what the `validate` job addresses.
 
 ## Deploy
 

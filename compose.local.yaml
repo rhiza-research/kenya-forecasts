@@ -1,0 +1,69 @@
+# The self-contained stack: the image plus a stand-in for the bucket, with no
+# credentials and nothing outside this file.
+#
+#   docker compose -f compose.local.yaml up -d --build
+#
+# Nothing is published to the host. To reach it from a browser, add a port and
+# set FILESTASH_HOST to the name and port you browse, which have to agree.
+#
+# The CI validate job runs this same file, so what it checks is what runs here.
+# Use compose.yaml instead to browse the real bucket, which needs an HMAC key.
+#
+# Everything matches production except S3_ENDPOINT: the same entrypoint, the same
+# config.json rendered by the same substitution, the same s3 connector signing
+# SigV4, the same passthrough identity provider. A backend that answers is
+# required, not optional. Filestash validates a session by listing through it, so
+# against an endpoint that rejects the credentials the connect page auto-submits
+# in a loop and no page ever renders.
+name: kenya-forecasts-local
+
+services:
+  app:
+    build: .
+    image: kenya-forecasts:local
+    environment:
+      # Filestash builds redirects from general.host and compares it against the
+      # request Host on every path outside /admin/, so this has to be the name
+      # the client uses. No port is published, so that name is the service name
+      # on the compose network. Publishing a port means also setting this to
+      # match it, because the comparison includes the port.
+      FILESTASH_HOST: app:8334
+      S3_BUCKET: kenya-forecasting-data
+      S3_ENDPOINT: http://minio:9000
+      # None of the four values below is a secret, and all four are committed on
+      # purpose so that nobody has to guess whether one leaked.
+      #
+      # FILESTASH_SECRET_KEY signs this container's own session cookies and is
+      # meaningless outside it. FILESTASH_ADMIN_BCRYPT is bcrypt cost 12 of the
+      # literal string kenya-forecasts-local; it gates /admin on this stack only.
+      # The two S3 values are the credentials of the minio container below, which
+      # holds an empty bucket and is reachable only on this compose network.
+      #
+      # They have nothing to do with production.
+      #
+      # $$ escapes the $ in the hash against compose interpolation.
+      FILESTASH_SECRET_KEY: local0validation
+      FILESTASH_ADMIN_BCRYPT: $$2y$$12$$OysBJDke5BOiWQ1vMS.uxu2xXkpTGaGEt.leIzixRL8sK9gVZuCwS
+      S3_ACCESS_KEY_ID: localaccesskey
+      S3_SECRET_ACCESS_KEY: localsecretkey
+    depends_on:
+      minio:
+        condition: service_started
+
+  minio:
+    image: quay.io/minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: localaccesskey
+      MINIO_ROOT_PASSWORD: localsecretkey
+      # Must match the region in app/config.json, which is the one GCS wants.
+      # SigV4 puts the region in the credential scope, so a mismatch fails the
+      # signature rather than being ignored.
+      MINIO_REGION: us
+    # minio's filesystem backend treats each top level directory as a bucket, so
+    # creating the directory is the whole setup and no mc client is needed.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /data/kenya-forecasting-data
+        exec minio server /data

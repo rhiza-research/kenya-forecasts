@@ -9,7 +9,109 @@ env:
   IMAGE_NAME: rhiza-research/kenya-forecasts
 
 jobs:
+  # applyPatch in server/ctrl/static.go returns nil on every failure path and the
+  # caller then serves the unpatched original, so a patch that stops applying
+  # drops the branding without an error, and one bad patch aborts the loop over
+  # the rest. This builds the image, runs it, and fails if the injected import is
+  # missing from the boot module, so a broken patch never reaches the registry.
+  #
+  # No bucket is involved. Filestash contacts the backend only when a session is
+  # established, and everything asserted here is served straight off the embedded
+  # filesystem and the plugin zip.
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE: docker compose -f compose.local.yaml
+      # compose derives this from the name: in compose.local.yaml.
+      NETWORK: kenya-forecasts-local_default
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start the stack
+        run: $COMPOSE up -d --build
+
+      # The stack publishes no port, so every request comes from a container on
+      # its network addressing the app by service name. That name is also
+      # FILESTASH_HOST, which is what Filestash compares the request Host against.
+      - name: Wait for it to serve
+        run: |
+          set -eu
+          for i in $(seq 30); do
+            if docker run --rm --network "$NETWORK" curlimages/curl:latest \
+                 -fsS -o /dev/null http://app:8334/; then
+              exit 0
+            fi
+            if [ -z "$($COMPOSE ps -q --status running app)" ]; then
+              echo "the app exited before serving" >&2
+              $COMPOSE logs
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "timed out waiting for the app to serve" >&2
+          $COMPOSE logs
+          exit 1
+
+      # Two things are checked. That the branding patch applied, because
+      # applyPatch returns nil on every failure path and its caller then serves
+      # the unpatched original, so a patch that stops matching drops the branding
+      # without an error. And that the bucket lists, which the asset checks alone
+      # would not catch: with no backend that answers, /api/session reports the
+      # session invalid and the connect page auto-submits forever while every
+      # asset keeps returning 200.
+      #
+      # The X-Requested-With header is what SecureOrigin accepts in place of a
+      # browser's own XHR marker. Without it every /api call is refused as an
+      # intrusion attempt.
+      #
+      # Substring tests are shell case, not grep -q, and the sed pipeline ends in
+      # tail rather than head: a reader that exits on its first match closes the
+      # pipe early, and the writer then dies of SIGPIPE, which pipefail reports as
+      # a failed pipeline even though the match succeeded.
+      - name: Assert the branding applied and the bucket lists
+        run: |
+          docker run --rm -i --network "$NETWORK" --entrypoint /bin/sh \
+            curlimages/curl:latest -s <<'SCRIPT'
+          set -eu
+          SITE=http://app:8334
+          SENTINEL='../plugin/branding.zip/index.js'
+
+          # BUILD_REF is in the served HTML as the asset path prefix.
+          ref=$(curl -fsS "$SITE/" | sed -n 's|.*/assets/\([0-9a-f]\{7,\}\)/.*|\1|p' | tail -1)
+          if [ -z "$ref" ]; then echo "could not read BUILD_REF from the page" >&2; exit 1; fi
+          echo "BUILD_REF=$ref"
+
+          boot=$(curl -fsS "$SITE/assets/$ref/boot/ctrl_boot_frontoffice.js")
+          case "$boot" in
+            *"$SENTINEL"*) ;;
+            *) echo "branding patch did NOT apply: $SENTINEL absent from the boot module" >&2; exit 1 ;;
+          esac
+          curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/index.js"
+          curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/kmsa-logo.jpg"
+          curl -fsS -o /dev/null "$SITE/custom.css"
+          echo "branding patch applied and plugin assets are served"
+
+          jar=$(mktemp)
+          xhr='X-Requested-With: XmlHttpRequest'
+          curl -fsS -c "$jar" -b "$jar" -H "$xhr" -o /dev/null "$SITE/"
+          curl -fsS -c "$jar" -b "$jar" -H "$xhr" -o /dev/null -X POST \
+            "$SITE/api/session/auth/?label=kenya-forecasts&state="
+          listing=$(curl -fsS -c "$jar" -b "$jar" -H "$xhr" "$SITE/api/files/ls?path=%2F")
+          echo "$listing"
+          case "$listing" in
+            *'"status": "ok"'*) ;;
+            *) echo "listing failed, the connector did not reach the bucket" >&2; exit 1 ;;
+          esac
+          echo "the bucket lists through the s3 connector"
+          SCRIPT
+
+      - name: Logs
+        if: always()
+        run: $COMPOSE logs
+
   build:
+    needs: [validate]
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
