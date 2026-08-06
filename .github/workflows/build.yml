@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
 
+# A run publishes an image and force-updates the deploy branch, so two in flight
+# race over what ArgoCD ends up with. Only the newest commit's run matters.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: rhiza-research/kenya-forecasts
