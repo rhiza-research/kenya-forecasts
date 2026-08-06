@@ -16,138 +16,49 @@
 // its real URL and the logo stored beside it resolves as a relative URL.
 
 
-// --- Copy -----------------------------------------------------------------
-//
-// All the text that appears on the page.
+// --- Markup ---------------------------------------------------------------
 
-const TITLE = "2026 OND Rainy Season Pilot Forecasts";
+const LOGO = new URL("./kmsa-logo.jpg", import.meta.url).href;
 
-const DESCRIPTION_BEFORE_LINK = "This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing (";
-const DESCRIPTION_LINK = { text: "github.com/alecjong-lab/ECMWF-S2S4AFRICA", href: "https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" };
-const DESCRIPTION_AFTER_LINK = ").";
+const HEADER = `
+<div class="kmsa-band kmsa-band-header">
+    <img class="kmsa-logo" src="${LOGO}" alt="Kenya Meteorological Service Authority" draggable="false">
+    <h1 class="kmsa-title">2026 OND Rainy Season Pilot Forecasts</h1>
+</div>
+<div class="kmsa-band kmsa-band-pilot">
+    <span class="kmsa-pill">PILOT</span>
+    <div class="kmsa-prose">
+        <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing (<a class="kmsa-link" href="https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" rel="noopener noreferrer" target="_blank">github.com/alecjong-lab/ECMWF-S2S4AFRICA</a>).</p>
+        <p class="kmsa-blurb kmsa-official">For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the <a class="kmsa-link" href="https://meteo.go.ke" rel="noopener noreferrer" target="_blank">Kenya Meteorological Service website</a>.</p>
+        <p class="kmsa-blurb">The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.</p>
+    </div>
+</div>
+<div class="kmsa-band kmsa-band-links">
+    <span class="kmsa-link-group">
+        <span class="kmsa-link-label">Methodology:</span>
+        <a class="kmsa-link" href="https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" rel="noopener noreferrer" target="_blank">github.com/alecjong-lab/ECMWF-S2S4AFRICA</a>
+    </span>
+    <span class="kmsa-link-group">
+        <span class="kmsa-link-label">Official forecasts:</span>
+        <a class="kmsa-link" href="https://meteo.go.ke" rel="noopener noreferrer" target="_blank">meteo.go.ke</a>
+    </span>
+</div>`;
 
-const DISCLAIMER = "The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.";
-
-const OFFICIAL_BEFORE_LINK = "For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the ";
-const OFFICIAL_LINK = { text: "Kenya Meteorological Service website", href: "https://meteo.go.ke" };
-const OFFICIAL_AFTER_LINK = ".";
-
-const DATA_LINE = "Forecast data is public sector information from the Government of Kenya, freely available for reuse.";
-
-const LINKS = [
-    { label: "Methodology:", text: "github.com/alecjong-lab/ECMWF-S2S4AFRICA", href: "https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" },
-    { label: "Official forecasts:", text: "meteo.go.ke", href: "https://meteo.go.ke" },
-];
-
-const SOURCE = { text: "github.com/rhiza-research/kenya-forecasts", href: "https://github.com/rhiza-research/kenya-forecasts" };
-
-
-// --- DOM helpers ----------------------------------------------------------
-//
-// Shorthand for building the elements the bands are made of.
-
-// Creates an element with an optional class and text.
-function _el(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text) node.textContent = text;
-    return node;
-}
-
-// Creates a link that opens in a new tab.
-function _anchor(text, href) {
-    const a = _el("a", "kmsa-link", text);
-    a.href = href;
-    a.rel = "noopener noreferrer";
-    a.target = "_blank";
-    return a;
-}
-
-
-// --- Bands ----------------------------------------------------------------
-//
-// The branding itself. Each function returns one container that the stylesheet
-// places above or below the app in the page column.
-
-// Builds the top container: the logo and title band, the PILOT pill and
-// blurb band, and the links band.
-function buildHeader() {
-    const top = _el("div", "kmsa-chrome kmsa-chrome-top");
-    top.id = "kmsa-chrome-top";
-
-    const header = _el("div", "kmsa-band kmsa-band-header");
-    const logo = _el("img", "kmsa-logo");
-    logo.src = new URL("./kmsa-logo.jpg", import.meta.url).href;
-    logo.alt = "Kenya Meteorological Service Authority";
-    logo.draggable = false;
-    header.appendChild(logo);
-    header.appendChild(_el("h1", "kmsa-title", TITLE));
-    top.appendChild(header);
-
-    const pilot = _el("div", "kmsa-band kmsa-band-pilot");
-    pilot.appendChild(_el("span", "kmsa-pill", "PILOT"));
-    const prose = _el("div", "kmsa-prose");
-    const description = _el("p", "kmsa-blurb");
-    description.appendChild(document.createTextNode(DESCRIPTION_BEFORE_LINK));
-    description.appendChild(_anchor(DESCRIPTION_LINK.text, DESCRIPTION_LINK.href));
-    description.appendChild(document.createTextNode(DESCRIPTION_AFTER_LINK));
-    prose.appendChild(description);
-
-    const official = _el("p", "kmsa-blurb kmsa-official");
-    official.appendChild(document.createTextNode(OFFICIAL_BEFORE_LINK));
-    official.appendChild(_anchor(OFFICIAL_LINK.text, OFFICIAL_LINK.href));
-    official.appendChild(document.createTextNode(OFFICIAL_AFTER_LINK));
-    prose.appendChild(official);
-
-    prose.appendChild(_el("p", "kmsa-blurb", DISCLAIMER));
-    pilot.appendChild(prose);
-    top.appendChild(pilot);
-
-    const links = _el("div", "kmsa-band kmsa-band-links");
-    for (const item of LINKS) {
-        const group = _el("span", "kmsa-link-group");
-        group.appendChild(_el("span", "kmsa-link-label", item.label));
-        group.appendChild(_anchor(item.text, item.href));
-        links.appendChild(group);
-    }
-    top.appendChild(links);
-
-    return top;
-}
-
-// Builds the bottom container: the data reuse line and the Filestash license
-// attribution.
-function buildFooter() {
-    const bottom = _el("div", "kmsa-chrome kmsa-chrome-bottom");
-    bottom.id = "kmsa-chrome-bottom";
-
-    bottom.appendChild(_el("p", "kmsa-footer-line", DATA_LINE));
-
-    const attribution = _el("p", "kmsa-footer-line");
-    attribution.appendChild(document.createTextNode("Powered by Filestash, licensed AGPL-3.0. Source: "));
-    attribution.appendChild(_anchor(SOURCE.text, SOURCE.href));
-    bottom.appendChild(attribution);
-
-    return bottom;
-}
+const FOOTER = `
+<p class="kmsa-footer-line">Forecast data is public sector information from the Government of Kenya, freely available for reuse.</p>
+<p class="kmsa-footer-line">Powered by Filestash, licensed AGPL-3.0. Source: <a class="kmsa-link" href="https://github.com/rhiza-research/kenya-forecasts" rel="noopener noreferrer" target="_blank">github.com/rhiza-research/kenya-forecasts</a></p>`;
 
 
 // --- Current date row marker ----------------------------------------------
-//
-// Puts a TODAY pill and a background tint on the listing row for the current
-// date. The archive names its folders with an ISO date, so the row name is the
-// signal.
 
-// Marks the row named for today, comparing the row's own name against the
-// archive's YYYY-MM-DD folder naming.
+// Puts a TODAY pill and a background tint on the row named for today, matching
+// against the archive's YYYY-MM-DD folder naming.
 //
 // The date comes from local time. Not toISOString, which is UTC and would name
 // yesterday for anyone east of Greenwich in the morning.
 //
 // Only the name is compared, never the rest of the path: inside today's folder
 // every child path still contains today's date, which would mark every row.
-//
-// The data attribute keeps the pill from being appended twice.
 function markToday(root) {
     const now = new Date();
     const iso = now.getFullYear() + "-" +
@@ -161,7 +72,10 @@ function markToday(root) {
         row.setAttribute("data-kmsa-today", "true");
         const name = row.querySelector(".component_filename");
         if (name && !name.querySelector(".kmsa-today-badge")) {
-            name.appendChild(_el("span", "kmsa-today-badge", "TODAY"));
+            const badge = document.createElement("span");
+            badge.className = "kmsa-today-badge";
+            badge.textContent = "TODAY";
+            name.appendChild(badge);
         }
     }
 }
@@ -179,19 +93,22 @@ function watchListing() {
 
 // --- Startup --------------------------------------------------------------
 
-// Value of the data-kmsa-branding attribute set on the root element. Nothing
-// reads it; it is there to make the branding visible in the DOM.
-const SENTINEL = "kmsa-branding";
+function band(id, markup) {
+    const node = document.createElement("div");
+    node.id = id;
+    node.className = "kmsa-chrome " + id;
+    node.innerHTML = markup;
+    return node;
+}
 
-// Adds both containers and starts the row marking. The stylesheet lays body out
-// as a column, so document order decides placement: the header goes before #app
-// and the footer after it. The id check makes a second import a no-op rather
-// than a second set of bands.
+// Adds both bands and starts the row marking. The stylesheet lays body out as a
+// column, so document order decides placement: the header goes before #app and
+// the footer after it. The id check makes a second import a no-op rather than a
+// second set of bands.
 function install() {
     if (document.getElementById("kmsa-chrome-top")) return;
-    document.documentElement.setAttribute("data-kmsa-branding", SENTINEL);
-    document.body.insertBefore(buildHeader(), document.body.firstChild);
-    document.body.appendChild(buildFooter());
+    document.body.insertBefore(band("kmsa-chrome-top", HEADER), document.body.firstChild);
+    document.body.appendChild(band("kmsa-chrome-bottom", FOOTER));
     watchListing();
 }
 
