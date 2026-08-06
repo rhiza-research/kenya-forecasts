@@ -42,8 +42,8 @@ const HEADER = `
     </span>
 </div>`;
 
+// <p class="kmsa-footer-line">Forecast data is public sector information from the Government of Kenya, freely available for reuse.</p>
 const FOOTER = `
-<p class="kmsa-footer-line">Forecast data is public sector information from the Government of Kenya, freely available for reuse.</p>
 <p class="kmsa-footer-line">Powered by Filestash, licensed AGPL-3.0. Source: <a class="kmsa-link" href="https://github.com/rhiza-research/kenya-forecasts" rel="noopener noreferrer" target="_blank">github.com/rhiza-research/kenya-forecasts</a></p>`;
 
 
