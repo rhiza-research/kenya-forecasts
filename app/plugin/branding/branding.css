@@ -149,10 +149,6 @@ body {
     line-height: 1.45;
 }
 
-.kmsa-official {
-    font-weight: 600;
-}
-
 .kmsa-band-links {
     display: flex;
     flex-wrap: wrap;

@@ -28,8 +28,7 @@ const HEADER = `
 <div class="kmsa-band kmsa-band-pilot">
     <span class="kmsa-pill">PILOT</span>
     <div class="kmsa-prose">
-        <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing (<a class="kmsa-link" href="https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" rel="noopener noreferrer" target="_blank">github.com/alecjong-lab/ECMWF-S2S4AFRICA</a>).</p>
-        <p class="kmsa-blurb kmsa-official">For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the <a class="kmsa-link" href="https://meteo.go.ke" rel="noopener noreferrer" target="_blank">Kenya Meteorological Service website</a>.</p>
+        <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing. For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the Kenya Meteorological Service website.</p>
     </div>
 </div>
 <div class="kmsa-band kmsa-band-links">
