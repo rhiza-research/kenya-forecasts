@@ -30,7 +30,6 @@ const HEADER = `
     <div class="kmsa-prose">
         <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing (<a class="kmsa-link" href="https://github.com/alecjong-lab/ECMWF-S2S4AFRICA" rel="noopener noreferrer" target="_blank">github.com/alecjong-lab/ECMWF-S2S4AFRICA</a>).</p>
         <p class="kmsa-blurb kmsa-official">For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the <a class="kmsa-link" href="https://meteo.go.ke" rel="noopener noreferrer" target="_blank">Kenya Meteorological Service website</a>.</p>
-        <p class="kmsa-blurb">The forecasts and supporting data available through this pilot are provided for evaluation purposes during the 2026 OND season. Official weather forecasts, warnings, and advisories are issued by the Kenya Meteorological Service at meteo.go.ke.</p>
     </div>
 </div>
 <div class="kmsa-band kmsa-band-links">
