@@ -20,3 +20,22 @@ diff --git a/public/assets/components/breadcrumb.js b/public/assets/components/b
                  return word;
              };
              const isLast = idx === pathChunks.length - 1;
+diff --git a/public/assets/pages/filespage/state_config.js b/public/assets/pages/filespage/state_config.js
+--- a/public/assets/pages/filespage/state_config.js
++++ b/public/assets/pages/filespage/state_config.js
+@@ -8,4 +8,4 @@
+         view: getConfig("default_view", "grid"),
+         show_hidden: getConfig("display_hidden", false),
+         sort: getConfig("default_sort", "type"),
+-        order: undefined,
++        order: "desc",
+diff --git a/public/assets/pages/filespage/helper.js b/public/assets/pages/filespage/helper.js
+--- a/public/assets/pages/filespage/helper.js
++++ b/public/assets/pages/filespage/helper.js
+@@ -100,4 +100,4 @@
+ function sortNumber(a, b, order) {
+-    if (order === "asc") return b - a;
+-    return a - b;
++    if (order === "asc") return a - b;
++    return b - a;
+ }

@@ -91,6 +91,11 @@ jobs:
           case "$crumb" in
             *"word.length > 27"*) echo "breadcrumb patch did NOT apply: the title is still truncated" >&2; exit 1 ;;
           esac
+          order=$(curl -fsS "$SITE/assets/$ref/pages/filespage/state_config.js")
+          case "$order" in
+            *'order: "desc"'*) ;;
+            *) echo "sort order patch did NOT apply: the listing will be oldest first" >&2; exit 1 ;;
+          esac
           curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/index.js"
           curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/kmsa-logo.jpg"
           curl -fsS -o /dev/null "$SITE/custom.css"
