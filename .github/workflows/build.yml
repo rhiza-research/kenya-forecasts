@@ -87,10 +87,14 @@ jobs:
             *"$SENTINEL"*) ;;
             *) echo "branding patch did NOT apply: $SENTINEL absent from the boot module" >&2; exit 1 ;;
           esac
+          crumb=$(curl -fsS "$SITE/assets/$ref/components/breadcrumb.js")
+          case "$crumb" in
+            *"word.length > 27"*) echo "breadcrumb patch did NOT apply: the title is still truncated" >&2; exit 1 ;;
+          esac
           curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/index.js"
           curl -fsS -o /dev/null "$SITE/assets/$ref/plugin/branding.zip/kmsa-logo.jpg"
           curl -fsS -o /dev/null "$SITE/custom.css"
-          echo "branding patch applied and plugin assets are served"
+          echo "both patches applied and plugin assets are served"
 
           jar=$(mktemp)
           xhr='X-Requested-With: XmlHttpRequest'

@@ -1,11 +1,22 @@
 diff --git a/public/assets/boot/ctrl_boot_frontoffice.js b/public/assets/boot/ctrl_boot_frontoffice.js
 --- a/public/assets/boot/ctrl_boot_frontoffice.js
 +++ b/public/assets/boot/ctrl_boot_frontoffice.js
-@@ -6,6 +6,7 @@
+@@ -6,3 +6,4 @@
  import { init as setup_cache } from "../pages/filespage/cache.js";
  import { report } from "../helpers/log.js";
  import { $error } from "./common.js";
 +import "../plugin/branding.zip/index.js";
- 
- export default async function main() {
-     try {
+diff --git a/public/assets/components/breadcrumb.js b/public/assets/components/breadcrumb.js
+--- a/public/assets/components/breadcrumb.js
++++ b/public/assets/components/breadcrumb.js
+@@ -85,10 +85,5 @@
+             const link = pathChunks.slice(0, idx + 1).join("/") + "/";
+             const limitSize = (word, highlight = false) => {
+-                if (highlight === true && word.length > 30) {
+-                    return word.substring(0, 12).trim() + "..." +
+-                        word.substring(word.length - 10, word.length).trim();
+-                }
+-                else if (word.length > 27) return word.substring(0, 20).trim() + "...";
+                 return word;
+             };
+             const isLast = idx === pathChunks.length - 1;
