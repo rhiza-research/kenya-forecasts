@@ -254,6 +254,15 @@ button[data-action=delete] {
 }
 
 /*
+ * The boot screen is a Nyan cat animation. It is written by an inline script in
+ * index.frontoffice.html, which no patch module can reach, so it is hidden here
+ * instead. The page shows the background color until the app mounts.
+ */
+#n-lder {
+    display: none !important;
+}
+
+/*
  * The sidebar duplicates the listing: its navigation pane lists the same date
  * folders the file page already shows.
  *
