@@ -256,9 +256,21 @@ button[data-action=delete] {
 /*
  * The sidebar duplicates the listing: its navigation pane lists the same date
  * folders the file page already shows.
+ *
+ * The wrapper is what holds the column open, so hiding the inner
+ * .component_sidebar alone leaves an empty gutter. decorator_shell_filemanager
+ * .css keys its own full width rules off the wrapper carrying .hidden or being
+ * :empty, neither of which a stylesheet can produce, so the wrapper is hidden
+ * instead and its sibling padding is dropped.
  */
-.component_sidebar {
+.component_filemanager_shell [data-bind="sidebar"] {
     display: none !important;
+}
+
+.component_filemanager_shell [data-bind="sidebar"] ~ div [is="component_filesystem"],
+.component_filemanager_shell [data-bind="sidebar"] ~ div component-menubar,
+.component_filemanager_shell [data-bind="sidebar"] ~ div [is="component_submenu"] .component_submenu {
+    padding: 0;
 }
 
 /*
