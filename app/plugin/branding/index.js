@@ -28,7 +28,7 @@ const HEADER = `
 <div class="kmsa-band kmsa-band-pilot">
     <span class="kmsa-pill">PILOT</span>
     <div class="kmsa-prose">
-        <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions, produced from the ECMWF operational sub-seasonal-to-seasonal (S2S) forecast with custom post-processing. For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the Kenya Meteorological Service website.</p>
+        <p class="kmsa-blurb">This pilot provides enhanced forecasts through the rainy season to support agricultural decisions and is produced through a methodology developed by the Kenya Meteorological Service Authority (KMSA) in collaboration with the Climate Hazards Center (CHC) and Karlsruhe Institute of Technology (KIT). For the official forecasts, weather advisories, seasonal outlooks, and the full suite of operational forecasting products, please visit the KMSA website.</p>
     </div>
 </div>
 <div class="kmsa-band kmsa-band-links">
@@ -44,7 +44,7 @@ const HEADER = `
 
 // <p class="kmsa-footer-line">Forecast data is public sector information from the Government of Kenya, freely available for reuse.</p>
 const FOOTER = `
-<p class="kmsa-footer-line">Powered by Filestash, licensed AGPL-3.0. Source: <a class="kmsa-link" href="https://github.com/rhiza-research/kenya-forecasts" rel="noopener noreferrer" target="_blank">github.com/rhiza-research/kenya-forecasts</a></p>`;
+<p class="kmsa-footer-line">Powered by Filestash. <a class="kmsa-link" href="https://github.com/rhiza-research/kenya-forecasts" rel="noopener noreferrer" target="_blank">github.com/rhiza-research/kenya-forecasts</a></p>`;
 
 
 // --- Current date row marker ----------------------------------------------
