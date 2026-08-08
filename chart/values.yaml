@@ -2,7 +2,7 @@
 
 image:
   repository: ghcr.io/rhiza-research/kenya-forecasts
-  tag: latest
+  tag: dc30c61258f9b8e73342d6b697cd83499f962269
   pullPolicy: Always
 
 imagePullSecrets: []
